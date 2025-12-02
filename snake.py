@@ -5,7 +5,7 @@ BLACK = (0, 0, 0)
 RED = (255, 0, 0)
 GREEN = (0, 255, 0)
 BLUE = (0, 0, 255)
-FPS = 10
+FPS = 8
 
 WIDTH, HEIGHT = 1000, 700
 SCREEN_SIZE = (WIDTH, HEIGHT)
@@ -47,7 +47,10 @@ def game_loop(screen):
     clock = pygame.time.Clock()
     start = False
 
+    move = False
+
     dx, dy = 0, 0 # movement direction
+    direction_changed = False
 
     snakes = [] # the snake (player)
     foods = []
@@ -65,58 +68,25 @@ def game_loop(screen):
                 if event.key == pygame.K_RETURN:
                     start = True
                 # controlling the direction
-                if event.key == pygame.K_LEFT:
-                    if not start:
-                        start = True
-                    if dx == 0:
-                        dx -= 1
-                        dy = 0
-                    elif dx == -1:
-                        ...
-                    elif dx == 1:
-                        ...
-                    else:
-                        dx *= -1
-                        dy = 0
-                elif event.key == pygame.K_UP:
-                    if not start:
-                        start = True
-                    if dy == 0:
-                        dy -= 1
-                        dx = 0
-                    elif dy == -1:
-                        ...
-                    elif dy == 1:
-                        ...
-                    else:
-                        dy *= -1
-                        dx = 0
-                elif event.key == pygame.K_RIGHT:
-                    if not start:
-                        start = True
-                    if dx == 0:
-                        dx += 1
-                        dy = 0
-                    elif dx == 1:
-                        ...
-                    elif dx == -1:
-                        ...
-                    else:
-                        dx *= -1
-                        dy = 0
-                elif event.key == pygame.K_DOWN:
-                    if not start:
-                        start = True
-                    if dy == 0:
-                        dy += 1
-                        dx = 0
-                    elif dy == 1:
-                        ...
-                    elif dy == -1:
-                        ...
-                    else:
-                        dy *= -1
-                        dx = 0
+                if event.key == pygame.K_q:
+                    running = False
+                #if not direction_changed:
+                if event.key == K_LEFT and dx != 1 and not direction_changed:
+                    start = True
+                    dx, dy = -1, 0
+                    direction_changed = True
+                elif event.key == K_RIGHT and dx != -1 and not direction_changed:
+                    start = True
+                    dx, dy = 1, 0
+                    direction_changed = True
+                elif event.key == K_UP and dy != 1 and not direction_changed:
+                    start = True
+                    dx, dy = 0, -1
+                    direction_changed = True
+                elif event.key == K_DOWN and dy != -1 and not direction_changed:
+                    start = True
+                    dx, dy = 0, 1
+                    direction_changed = True
 
         screen.fill(BLACK)
 
@@ -130,6 +100,7 @@ def game_loop(screen):
 
         if start: # moving the snake head
             snakes.insert(0, Snake(screen, (snakes[0].pos[0] + (50 * dx), snakes[0].pos[1] + (50 * dy)), GREEN))
+            direction_changed = False
             for food in foods:
                 #check if the snakes head collide with the food
                 if snakes[0].pos[0] == food.posx and snakes[0].pos[1] == food.posy:
