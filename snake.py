@@ -25,8 +25,16 @@ class Snake: # the individual snake object for snakes
     def draw_rect(self):
         pygame.draw.rect(self.screen, self.color, self.rect)
 
-def mov():
-    ...
+class Food():
+    def __init__(self, screen):
+        self.screen = screen
+        self.posx = random.randint(0, 19) * 50
+        self.posy = random.randint(0, 13) * 50
+        self.rect = pygame.Rect(self.posx, self.posy, 50, 50)
+
+    def draw_food(self):
+        pygame.draw.rect(self.screen, BLUE, self.rect, 10)
+
 
 def init():
     pygame.init()
@@ -42,9 +50,12 @@ def game_loop(screen):
     dx, dy = 0, 0 # movement direction
 
     snakes = [] # the snake (player)
+    foods = []
+    foods.append(Food(screen))
 
     for i in range(5):
         snakes.append(Snake(screen, (i * 50, i * 50,), GREEN))
+
 
     while running:
         for event in pygame.event.get():
@@ -114,9 +125,20 @@ def game_loop(screen):
         for snake in snakes: # drawing the snakes
             snake.draw_rect()
 
+        for food in foods:
+            food.draw_food()
+
         if start: # moving the snake head
             snakes.insert(0, Snake(screen, (snakes[0].pos[0] + (50 * dx), snakes[0].pos[1] + (50 * dy)), GREEN))
-            snakes.pop()
+            for food in foods:
+                #check if the snakes head collide with the food
+                if snakes[0].pos[0] == food.posx and snakes[0].pos[1] == food.posy:
+                    #remove the current food and add the snakes length before add another food
+                    foods.remove(food)
+                    foods.append(Food(screen))
+                else: #else, move the snakes normally
+                    snakes.pop()
+            
 
         pygame.display.update()
         clock.tick(FPS) # fps
