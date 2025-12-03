@@ -5,7 +5,7 @@ BLACK = (0, 0, 0)
 RED = (255, 0, 0)
 GREEN = (0, 255, 0)
 BLUE = (0, 0, 255)
-FPS = 8
+FPS = 10
 
 WIDTH, HEIGHT = 1000, 700
 SCREEN_SIZE = (WIDTH, HEIGHT)
@@ -50,7 +50,7 @@ def game_loop(screen):
     move = False
 
     dx, dy = 0, 0 # movement direction
-    direction_changed = False
+    direction_changed = False # prevent reverse movement
 
     snakes = [] # the snake (player)
     foods = []
