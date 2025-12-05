@@ -5,7 +5,7 @@ BLACK = (0, 0, 0)
 RED = (255, 0, 0)
 GREEN = (0, 255, 0)
 BLUE = (0, 0, 255)
-FPS = 10
+FPS = 9
 
 WIDTH, HEIGHT = 1000, 700
 SCREEN_SIZE = (WIDTH, HEIGHT)
@@ -53,11 +53,10 @@ def game_loop(screen):
     direction_changed = False # prevent reverse movement
 
     snakes = [] # the snake (player)
-    foods = []
+    foods = [] # the foods
     foods.append(Food(screen))
-
-    for i in range(5):
-        snakes.append(Snake(screen, (i * 50, i * 50,), GREEN))
+ 
+    snakes.append(Snake(screen, (9 * 50, 6 * 50,), GREEN))
 
 
     while running:
@@ -69,6 +68,8 @@ def game_loop(screen):
                     start = True
                 # controlling the direction
                 if event.key == pygame.K_q:
+                    running = False
+                if event.key == pygame.K_ESCAPE:
                     running = False
                 #if not direction_changed:
                 if event.key == K_LEFT and dx != 1 and not direction_changed:
@@ -98,17 +99,33 @@ def game_loop(screen):
         for food in foods:
             food.draw_food()
 
+        ate_food = False
         if start: # moving the snake head
-            snakes.insert(0, Snake(screen, (snakes[0].pos[0] + (50 * dx), snakes[0].pos[1] + (50 * dy)), GREEN))
+            new_head = Snake(screen, (snakes[0].pos[0] + (50 * dx), snakes[0].pos[1] + (50 * dy)), GREEN)
+            snakes.insert(0, new_head)
             direction_changed = False
+
             for food in foods:
                 #check if the snakes head collide with the food
                 if snakes[0].pos[0] == food.posx and snakes[0].pos[1] == food.posy:
                     #remove the current food and add the snakes length before add another food
                     foods.remove(food)
                     foods.append(Food(screen))
-                else: #else, move the snakes normally
-                    snakes.pop()
+                    ate_food = True
+                    break
+            
+            if not ate_food:
+                snakes.pop()
+            
+            #init the rule (walls)
+            if snakes[0].rect.x < 0 or snakes[0].rect.x >= WIDTH:   
+                running = False
+            if snakes[0].rect.y < 0 or snakes[0].rect.y >= HEIGHT:
+                running = False
+
+            for snake in snakes[1:]: #lose if the head collide with its body
+                if snakes[0].rect.colliderect(snake.rect):
+                    running = False
             
 
         pygame.display.update()
